@@ -1,40 +1,50 @@
-import altair as alt
-import numpy as np
-import pandas as pd
+# streamlit-app.py
+##
+## This script is designed to read all of filenames from a specified --column of a specified
+## --worksheet Google Sheet and fuzzy match with files found in a specified --tree-path
+## network (or other mounted) storage directory tree.
+##
+## If the --copy-to-azure option is set this script will attempt to deposit copies of any/all
+## OBJ files it finds into Azure Blob Storage.  If --extended (-x) is also specified, the script will also
+## search for and copy all _TN. and _JPG. files (substituting those for _OBJ.) that it finds.
+## The copy-to-azure operation will also generate a .csv file containing Azure Blob URL(s) suitable
+## for input into the `object_location`, `image_small`, and `image_thumb` columns of a CollectionBuilder CSV ## file or Google Sheet.
+
 import streamlit as st
+import tkinter as tk
+from tkinter import filedialog
 
-"""
-# Welcome to Streamlit!
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+# Modules defined and used in https://medium.com/@kjavaman12/how-to-create-a-folder-selector-in-streamlit-e44816c06afd
+# ---------------------------------------------------------------------
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+def select_folder( ):
+    root = tk.Tk( )
+    root.withdraw( )
+    folder_path = filedialog.askdirectory(master=root)
+    root.destroy( )
+    return folder_path
 
-num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
-num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
 
-indices = np.linspace(0, 1, num_points)
-theta = 2 * np.pi * num_turns * indices
-radius = indices
+# test( )
+# ---------------------------------------------------------------------
+def test( ):
+    selected_folder_path = st.session_state.get("folder_path", None)
+    folder_select_button = st.button("Select Folder")
+    if folder_select_button:
+        selected_folder_path = select_folder( )
+        st.session_state.folder_path = selected_folder_path
 
-x = radius * np.cos(theta)
-y = radius * np.sin(theta)
+    if selected_folder_path:
+        st.write("Selected folder path:", selected_folder_path)
 
-df = pd.DataFrame({
-    "x": x,
-    "y": y,
-    "idx": indices,
-    "rand": np.random.randn(num_points),
-})
+# ----------------------------------------------------------------------        
+# --- Main
 
-st.altair_chart(alt.Chart(df, height=700, width=700)
-    .mark_point(filled=True)
-    .encode(
-        x=alt.X("x", axis=None),
-        y=alt.Y("y", axis=None),
-        color=alt.Color("idx", legend=None, scale=alt.Scale()),
-        size=alt.Size("rand", legend=None, scale=alt.Scale(range=[1, 150])),
-    ))
+if __name__ == '__main__':
+
+    # --tree-path
+    test( )
+
+
+
