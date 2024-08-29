@@ -1,5 +1,11 @@
 # streamlit-app.py
 ##
+## This Streamlit (https://streamlit.io/) app replaces my old `network-file-finder` command line utility.  
+## Most functionality is unchanged with a few new features added.  The old command line parameters
+## have been replaced with similarly named GUI widgets.
+##
+## The old `network-file-finder` comments...
+## -----------------------------------------------------------------------------------------------------
 ## This script is designed to read all of filenames from a specified --column of a specified
 ## --worksheet Google Sheet and fuzzy match with files found in a specified --tree-path
 ## network (or other mounted) storage directory tree.
@@ -9,6 +15,7 @@
 ## search for and copy all _TN. and _JPG. files (substituting those for _OBJ.) that it finds.
 ## The copy-to-azure operation will also generate a .csv file containing Azure Blob URL(s) suitable
 ## for input into the `object_location`, `image_small`, and `image_thumb` columns of a CollectionBuilder CSV ## file or Google Sheet.
+## -----------------------------------------------------------------------------------------------------
 
 import os
 import streamlit as st
@@ -441,17 +448,18 @@ if __name__ == '__main__':
     if not state('output_to_csv'):
         st.session_state.output_to_csv = False
 
-    # Display and fetch options up top
-    with st.container(border=True):
+    # Display and fetch options in the sidebar
+    with st.sidebar:
 
         use_previous_file_list = st.checkbox(label="Check here to use the previous list of filenames stored in 'file-list.tmp'", value=False, key='use_previous_file_list_checkbox')
         st.session_state.use_previous_file_list = use_previous_file_list
 
+        output_to_csv = st.checkbox(label="Check here to output results to a CSV file", value=False, key='output_to_csv_checkbox')
+        st.session_state.output_to_csv = output_to_csv
+
         regex_text = st.text_input(label="Specify a 'regex' pattern here to limit the scope of your search", value=None, key='regex_text_input')
         st.session_state.regex_text = regex_text
 
-        output_to_csv = st.checkbox(label="Check here to output results to a CSV file", value=False, key='output_to_csv_checkbox')
-        st.session_state.output_to_csv = output_to_csv
 
     # Fetch the --worksheet argument
     if not state('use_previous_file_list'):
